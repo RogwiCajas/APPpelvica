@@ -1,8 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pelvica/Menu/menu.dart';
+import 'package:pelvica/Models/User.dart';
+import 'package:pelvica/constants.dart';
 
+const storage = FlutterSecureStorage();
 void main() {
   runApp(const MyApp());
 }
@@ -21,12 +24,99 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: mainColor),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'DATOS PERSONALES'),
+      home: const Splash(),
+      // home: const MyHomePage(title: 'DATOS PERSONALES'),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
+/**SPLASH */
+class Splash extends StatefulWidget {
+  const Splash({super.key});
+
+  @override
+  State<Splash> createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+  User user = User.empty();
+  bool isloading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(const Duration(milliseconds: 1400), () async {
+      String? name = await storage.read(key: "user");
+      setState(() {
+        user = User(
+            name: name ?? "",
+            age: 9,
+            isEmbarazo: false,
+            isPostParto: true,
+            valor: 3);
+        isloading = false;
+      });
+      setState(() {
+        Future.delayed(const Duration(milliseconds: 1000), () async {
+          if (user.name == '') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const MyHomePage(
+                  title: 'DATOS PERSONALES',
+                ),
+              ),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const Menu(),
+              ),
+            );
+          }
+        });
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(mainAxisSize: MainAxisSize.max, children: [
+      isloading
+          ? Expanded(
+              child: Container(
+              width: double.infinity,
+              color: Colors.white,
+              child: Image.asset(LogoHome),
+            ))
+          : Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                color: mainColor,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Bienvenida\n ${user.name} ",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 26,
+                          decoration: TextDecoration.none,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+            )
+    ]);
+  }
+}
+
+/**HOME */
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -56,12 +146,13 @@ class _MyHomePageState extends State<MyHomePage> {
         progressStep = 1;
         progressController.nextPage(
           curve: Curves.linear,
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 1000),
         );
       } else if (progressStep == 1 &&
           (isEmbarazo || isPostParto) &&
           mesanioController.text != "") {
         progressStep = 2;
+        storage.write(key: "user", value: nameController.text);
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (_) => const Menu()));
 

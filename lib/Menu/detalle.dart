@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pelvica/main.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+// import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Detalle extends StatefulWidget {
   const Detalle(
@@ -22,9 +23,16 @@ class _DetalleState extends State<Detalle> {
   final String titulo;
   final String descripcion;
   final String link;
-  YoutubePlayerController controller = YoutubePlayerController(
-    initialVideoId: 'iLnmTe5Q2Qw',
-  );
+  late YoutubePlayerController _controller;
+  @override
+  void initState() {
+    _controller = YoutubePlayerController.fromVideoId(
+      videoId: YoutubePlayerController.convertUrlToId(link)!,
+      autoPlay: false,
+      params: const YoutubePlayerParams(showFullscreenButton: true),
+    );
+    super.initState();
+  }
 
   _DetalleState(
       {required this.titulo, required this.descripcion, required this.link});
@@ -50,26 +58,30 @@ class _DetalleState extends State<Detalle> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Expanded(
-              child: Container(
-                margin:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                child: Column(
-                  children: [
-                    Container(
-                      height: size.height * 0.35,
-                      child: YoutubePlayer(
-                        controller: controller,
-                        liveUIColor: mainColor,
+              child: SingleChildScrollView(
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: Column(
+                    children: [
+                      Container(
+                        height: size.height * 0.35,
+                        width: double.infinity,
+                        color: mainColor,
+                        child: YoutubePlayer(
+                          controller: _controller,
+                          aspectRatio: 16 / 9,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      descripcion,
-                      textAlign: TextAlign.justify,
-                    ),
-                  ],
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        "¡Bienvenida otra vez! Recuerda siempre controlar tu respiración y postura al momento de realizar los ejercicios. Anda a tu ritmo sin forzarte demasiado, todo es un proceso ¡Vamos con todo! ",
+                        textAlign: TextAlign.justify,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
