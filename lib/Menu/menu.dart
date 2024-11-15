@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pelvica/Menu/submenu.dart';
+import 'package:pelvica/constants.dart';
 import 'package:pelvica/main.dart';
 
 class Menu extends StatefulWidget {
@@ -301,14 +302,21 @@ class _MenuState extends State<Menu> {
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                 width: double.infinity,
                 height: 100,
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.supervised_user_circle,
-                      size: 50,
-                      color: mainColor,
+                    ClipOval(
+                      child: Image.asset(
+                        IconoHome,
+                        height: 50,
+                        width: 54,
+                      ),
                     )
+                    // Icon(
+                    //   Icons.supervised_user_circle,
+                    //   size: 50,
+                    //   color: mainColor,
+                    // )
                   ],
                 ),
               ),
